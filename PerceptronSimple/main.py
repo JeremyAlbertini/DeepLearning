@@ -32,6 +32,7 @@ print(accuracy_score(y, y_pre))
 
 
 #drawing
+plt.clf()
 plt.plot(LogLoss)
 plt.savefig(PATH_DIRECTORY + "logloss.png")
 
