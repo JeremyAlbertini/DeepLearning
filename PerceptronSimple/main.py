@@ -7,7 +7,7 @@ from matplotlib.animation import FuncAnimation
 
 PATH_DIRECTORY = "PerceptronSimple/"
 
-X, y = make_blobs(n_samples=500, n_features=2, centers=2, random_state=1)
+X, y = make_blobs(n_samples=200, n_features=2, centers=2, random_state=2)
 y = y.reshape((y.shape[0], 1))
 
 plt.scatter(X[:,0], X[:, 1], c=y, cmap='summer')
