@@ -1,4 +1,4 @@
-from NN2LayerClass import NN2Layer
+from NNClass import NNetwork
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -6,15 +6,15 @@ from sklearn.datasets import make_blobs, make_circles, make_moons
 from sklearn.metrics import accuracy_score
 from tqdm import tqdm
 
-PATH_DIRECTORY = "NeuralNetwork2Layer/"
+PATH_DIRECTORY = "NeuralNetworkMultilayer/"
 
 X, y = make_circles(n_samples=300, factor=0.5, noise=0.05)
 
 # Moitié du cercle extérieur reçoit le même label que le cercle intérieur
-#outer_mask = y == 0
-#angles = np.arctan2(X[outer_mask, 1], X[outer_mask, 0])
-#outer_indices = np.where(outer_mask)[0]
-#y[outer_indices[angles > 0]] = 1
+outer_mask = y == 0
+angles = np.arctan2(X[outer_mask, 1], X[outer_mask, 0])
+outer_indices = np.where(outer_mask)[0]
+y[outer_indices[angles > 0]] = 1
 
 X = X.T
 y = y.reshape((1, y.shape[0]))
@@ -29,9 +29,9 @@ train_loss = []
 train_acc = []
 History = []
 
-model = NN2Layer(X.shape[0], 256, y.shape[0])
+model = NNetwork(X.shape[0], [32, 32,32], y.shape[0])
 
-for i in tqdm(range(10000)):
+for i in tqdm(range(5000)):
     model.forward_propagation(X)
 
     train_loss.append(model.log_loss(y))
@@ -39,7 +39,7 @@ for i in tqdm(range(10000)):
     train_acc.append(accuracy_score(y.flatten(), y_pred.flatten()))
 
     if i % 50 == 0:
-        History.append((model.W1.copy(), model.b1.copy(), model.W2.copy(), model.b2.copy()))
+        History.append((model.W[0].copy(), model.b[0].copy(), model.W[1].copy(), model.b[1].copy()))
 
     model.back_propagation(X, y)
     model.update(0.1)
@@ -65,18 +65,18 @@ fig_anim, ax_anim = plt.subplots(figsize=(9, 6))
 ax_anim.scatter(X[0, :], X[1, :], c=y.flatten(), cmap='summer', edgecolors='k', linewidths=0.5, zorder=3)
 
 W1, b1, W2, b2 = History[0]
-model.W1, model.b1, model.W2, model.b2 = W1, b1, W2, b2
+model.W[0], model.b[0], model.W[1], model.b[1] = W1, b1, W2, b2
 model.forward_propagation(X_grid)
-prob0 = model.A2.reshape(XX1.shape)
+prob0 = model.A[-1].reshape(XX1.shape)
 contour = ax_anim.contour(XX1, XX2, prob0, levels=[0.5], colors='orange', linewidths=3, zorder=4)
 title_anim = ax_anim.set_title('')
 
 def update_anim(frame):
     global contour
     W1, b1, W2, b2 = History[frame]
-    model.W1, model.b1, model.W2, model.b2 = W1, b1, W2, b2
+    model.W[0], model.b[0], model.W[1], model.b[1] = W1, b1, W2, b2
     model.forward_propagation(X_grid)
-    prob = model.A2.reshape(XX1.shape)
+    prob = model.A[-1].reshape(XX1.shape)
     contour.remove()
     contour = ax_anim.contour(XX1, XX2, prob, levels=[0.5], colors='orange', linewidths=3, zorder=4)
     title_anim.set_text(f'Iteration {frame * 50}')
